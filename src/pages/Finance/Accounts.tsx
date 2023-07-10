@@ -125,6 +125,7 @@ const Accounts = () => {
               return (
                 <div
                   className="w-[200px] p-[15px] relative h-[250px] bg-[#fff] rounded-[10px] shadow-lg"
+                  key={account.id}
                   onClick={() => {
                     clickedAccount === account.id
                       ? setClickedAccount("")

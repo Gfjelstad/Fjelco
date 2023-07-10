@@ -12,7 +12,7 @@ const BudgetItem = (props: any) => {
 
   useEffect(() => {
     if (props.items != budget) props.onChange(budget);
-  }, [budget]);
+  }, [budget, "fill"]);
 
   const addBudgetItem = async () => {
     const data: any = await axios.post("/api/routes/updateDocument", {

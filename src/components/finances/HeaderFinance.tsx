@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import React from "react";
 
-const headerFinance = (props: any) => {
+const HeaderFinance = (props: any) => {
   const router = useRouter();
   return (
     <div className="w-full bg-[#fff] h-[70px] flex items-center justify-between pl-[30px] pr-[30px] border-b-[2px] border-[#00000030]  ">
@@ -18,4 +18,4 @@ const headerFinance = (props: any) => {
   );
 };
 
-export default headerFinance;
+export default HeaderFinance;

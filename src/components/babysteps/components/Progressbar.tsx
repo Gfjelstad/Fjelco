@@ -3,7 +3,10 @@ import React from "react";
 const Progressbar = (props: any) => {
   console.log(props);
   return (
-    <div className="w-[80%] flex items-center justify-between">
+    <div
+      className="w-[80%] flex items-center justify-between"
+      key={`Progress-${props.name}`}
+    >
       <div className="w-[180px] overflow-hidden">
         <h2 className="text-[18px] text-[black]">{props.name}</h2>
       </div>

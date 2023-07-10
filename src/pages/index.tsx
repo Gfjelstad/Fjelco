@@ -56,7 +56,7 @@ export default function Home() {
           <div>
             <h2 className="text-[#fff] text-[52px]">
               Hello!
-              <br /> I'm Grant
+              <br /> I&apos;m Grant
             </h2>
           </div>
           <div></div>
