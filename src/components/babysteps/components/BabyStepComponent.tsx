@@ -4,12 +4,14 @@ type NextElementProps<T = {}> = T & {
   children?: ReactNode;
   currentStep: number;
   step: any;
+  key: string;
 };
 
 const BabyStepComponent = (props: NextElementProps) => {
   const { step, children, currentStep } = props;
   return (
     <div
+      key={props.key}
       className={`w-[80%] mt-[25px] mr-[0px] overflow-hidden rounded-[10px] shadow-lg bg-[#fff] ${
         currentStep === step.step ? "border border-[#000000]" : ""
       }`}

@@ -127,7 +127,7 @@ const Assets = () => {
             .map((asset: any) => {
               return (
                 <div
-                  key={asset.id}
+                  key={`item-${asset.id}`}
                   className="w-[200px] p-[15px] relative h-[250px] bg-[#fff] rounded-[10px] shadow-lg"
                   onClick={() => {
                     clickedAsset === asset.id
@@ -198,6 +198,7 @@ const Assets = () => {
             .map((asset: any) => {
               return (
                 <div
+                  key={`item-${asset.id}`}
                   className="w-[200px] p-[15px] relative h-[250px] bg-[#fff] rounded-[10px] shadow-lg"
                   onClick={() => {
                     clickedAsset === asset.id

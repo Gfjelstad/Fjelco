@@ -5,6 +5,7 @@ const RenderStep1 = (props: any) => {
   return (
     <div className="w-full flex flex-col gap-[20px] pb-[50px] items-start pl-[30px] pt-[30px]">
       <Progressbar
+        key={props.account.id}
         name={props.account.id}
         amount={props.account.amount}
         limit={props.account.goal}
@@ -23,6 +24,7 @@ const RenderStep2 = (props: any) => {
         .map((account: any) => {
           return (
             <Progressbar
+              key={account.id}
               name={account.id}
               amount={account.amount + account.total}
               limit={account.total}
@@ -43,6 +45,7 @@ const RenderStep4 = (props: any) => {
         .map((account: any) => {
           return (
             <Progressbar
+              key={account.id}
               name={account.id}
               amount={account.amount + account.total}
               limit={account.total}

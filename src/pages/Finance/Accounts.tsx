@@ -125,7 +125,7 @@ const Accounts = () => {
               return (
                 <div
                   className="w-[200px] p-[15px] relative h-[250px] bg-[#fff] rounded-[10px] shadow-lg"
-                  key={account.id}
+                  key={`item-${account.id}`}
                   onClick={() => {
                     clickedAccount === account.id
                       ? setClickedAccount("")
@@ -196,6 +196,7 @@ const Accounts = () => {
             .map((account: any) => {
               return (
                 <div
+                  key={`item-${account.id}`}
                   className="w-[200px] p-[15px] relative h-[250px] bg-[#fff] rounded-[10px] shadow-lg"
                   onClick={() => {
                     clickedAccount === account.id

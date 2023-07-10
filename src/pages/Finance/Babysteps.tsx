@@ -16,7 +16,7 @@ const Babysteps = () => {
   useEffect(() => {
     if (isFetched && isbudgetFetched && isaccountFetched)
       setCurrentStep(getCurrentBabyStep(accountData.data, budgetdata.data)!);
-  }, [babyStepdata, budgetdata, accountData]);
+  }, [babyStepdata, budgetdata, accountData, "other"]);
   return (
     isFetched &&
     isaccountFetched &&
@@ -28,6 +28,7 @@ const Babysteps = () => {
             if (currentStep > 3) {
               return (
                 <BabyStepComponent
+                  key={`step-${step.step}`}
                   currentStep={
                     step.step > 3 && step.step != 7 ? step.step : currentStep
                   }
@@ -41,7 +42,11 @@ const Babysteps = () => {
               );
             } else {
               return (
-                <BabyStepComponent currentStep={currentStep} step={step}>
+                <BabyStepComponent
+                  currentStep={currentStep}
+                  step={step}
+                  key={`step-${step.step}`}
+                >
                   <RenderStep
                     currentStep={currentStep}
                     accounts={accountData.data}
