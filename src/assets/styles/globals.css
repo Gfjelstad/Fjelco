@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+}
+
+#businessItem {
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+#businessItem:hover {
+  scale: 1.2;
+  box-shadow: 0px 0px 10px #2e2e2e;
+}
+
+@font-face {
+  font-family: haltrFont;
+  src: url("../fonts/haltr.OTF");
+}
+
+* {
+  font-family: haltrFont;
+}
