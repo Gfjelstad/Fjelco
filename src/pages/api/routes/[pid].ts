@@ -59,7 +59,6 @@ const index = async (req: any, res: Response) => {
       // console.log(pid);
       res.status(response.status).send(response.data);
   }
-  // console.log(response);
 };
 
 export default index;
