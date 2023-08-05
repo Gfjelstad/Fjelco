@@ -75,6 +75,18 @@ const NavBarFinance = () => {
         >
           Assets
         </button>
+        <button
+          className={`pl-14 pt-[15px] text-[26px] ${
+            router.pathname.split("/").includes("Network")
+              ? "text-[#0066FF]"
+              : "text-[#000000]"
+          } `}
+          onClick={() => {
+            router.push("Network");
+          }}
+        >
+          Network
+        </button>
       </div>
       <div className="w-full mb-[30px] flex justify-center">
         <button

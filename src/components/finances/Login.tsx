@@ -29,7 +29,8 @@ const Login = () => {
       return;
     }
 
-    const result = await loginUser(email, password).then(() => {
+    const result = await loginUser(email, password).then((res) => {
+      console.log(res);
       window.location.reload();
       router.push("/Finance");
     });

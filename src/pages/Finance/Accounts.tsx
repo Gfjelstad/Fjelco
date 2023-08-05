@@ -241,7 +241,8 @@ const Accounts = () => {
                       >
                         <h2 className="text-[#fff] text-[15px]">Edit</h2>
                       </button>
-                      {account.id != "Emergency Fund" && (
+                      {account.id == "Emergency Fund" ||
+                      account.id == "Checking Account" ? null : (
                         <button
                           className="h-[20px] pt-[5px] w-[20px] rounded-[10px] bg-[#0066FF] flex items-center justify-center"
                           onClick={async () => {

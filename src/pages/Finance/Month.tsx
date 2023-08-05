@@ -31,8 +31,8 @@ const Month = () => {
     null
   );
   const [accountTab, setAccountTab] = useState("from");
-  const [fromAccounts, setFromAccounts] = useState(["Income"]);
-  const [toAccounts, setToAccounts] = useState(["Truck Fund"]);
+  const [fromAccounts, setFromAccounts] = useState<any>([{ id: "Income" }]);
+  const [toAccounts, setToAccounts] = useState<any>([{ id: "" }]);
   const [newTransaction, setNewTransaction] = useState<any | null>(null);
   const {
     data: monthData,
@@ -41,32 +41,33 @@ const Month = () => {
   } = useThisMonth();
   const { data: infoData } = useInfo();
   const { data: budgetData } = useBudgetItems();
-  const { data: accountData } = useAccounts();
+  const { data: accountData, refetch: refetchAccounts } = useAccounts();
 
   useEffect(() => {
     if (typeof monthData != "undefined") {
       const thisDate = format(new Date(), "MM-yyyy");
       console.log(monthData.data.filter((month: any) => month.id === thisDate));
-      const thisMonth = monthData.data.filter(
-        (month: any) => month.id === thisDate
-      )[0];
-      console.log(monthData.data);
-      setMonth(monthData.data[0]);
-      setFromAccounts([
-        "Income",
-        ...accountData.data
-          .map((item: any) => {
-            if (item.type === "fund") {
-              return item.id;
-            }
-          })
-          .filter((item: any) => typeof item != "undefined"),
-      ]);
-      setToAccounts([
-        ...accountData.data.map((item: any) => {
-          return item.id;
-        }),
-      ]);
+
+      console.log("monthdata", monthData.data);
+      if (monthData.data.length === 0) {
+        ifNoMonthCreateNew();
+      } else {
+        setMonth(monthData.data[0]);
+        setFromAccounts([
+          ...accountData.data
+            .map((item: any) => {
+              if (item.type === "fund") {
+                return item;
+              }
+            })
+            .filter((item: any) => typeof item != "undefined"),
+        ]);
+        setToAccounts([
+          ...accountData.data.map((item: any) => {
+            return item;
+          }),
+        ]);
+      }
       //   setIncome(monthData.data[0].income);
       //   setTransactions(monthData.data[0].transactions);
     }
@@ -80,13 +81,29 @@ const Month = () => {
           ...month.income,
           { amount: incomeInput, date: format(new Date(), "MM/dd/yy") },
         ],
-      }).then(() => {
+      }).then(async () => {
         refetchMonth();
+        await Accounttransaction(
+          "Checking Account",
+          "Income",
+          incomeInput,
+          accountData.data
+        ).then(() => {
+          refetchAccounts();
+        });
       });
     }
   };
 
-  const handleCompleteMonth = async () => {
+  const ifNoMonthCreateNew = async () => {
+    await createNewMonth(budgetData.data, format(new Date(), "MM-yyyy")).then(
+      () => {
+        refetchMonth();
+      }
+    );
+  };
+
+  const handleCompleteMonth = async (current?: boolean) => {
     const thisDate = format(new Date(), "MM-yyyy");
     const replaceMonth = async (date: string) => {
       console.log("monthData sent to complete month", month);
@@ -99,6 +116,7 @@ const Month = () => {
       });
     };
     // console.log(getNextMonth());
+
     if (month.id === thisDate) {
       replaceMonth(getNextMonth());
     } else {
@@ -210,11 +228,12 @@ const Month = () => {
             </div>
             <div className="w-full h-[630px] overflow-y-scroll flex overflow-x-hidden  flex-col items-center pb-[20px]">
               {accountTab === "from"
-                ? fromAccounts.map((account) => {
+                ? fromAccounts.map((account: any) => {
+                    // console.log("from account", account);
                     return (
                       <button
                         className="w-full h-[30px] hover:scale-[1.01] border-b border-[#00000030] flex items-center justify-center"
-                        key={`account-${account}`}
+                        key={`account-${account.id}`}
                         onClick={() => {
                           setNewTransaction({
                             to: "",
@@ -224,14 +243,19 @@ const Month = () => {
                           });
                         }}
                       >
-                        <h2 className="text-[#000000]">{account}</h2>
+                        <h2 className="text-[#000000]">{account.id}</h2>
+                        {account.id != "Income" && (
+                          <h2 className="pl-[20px] text-[#00000070]">
+                            $ {account.amount}
+                          </h2>
+                        )}
                       </button>
                     );
                   })
-                : toAccounts.map((account) => {
+                : toAccounts.map((account: any) => {
                     return (
                       <button
-                        key={`account-${account}`}
+                        key={`account-${account.id}`}
                         className="w-full h-[30px] hover:scale-[1.01] border-b border-[#00000030] flex items-center justify-center"
                         onClick={() => {
                           setNewTransaction({
@@ -242,7 +266,12 @@ const Month = () => {
                           });
                         }}
                       >
-                        <h2 className="text-[#000000]">{account}</h2>
+                        <h2 className="text-[#000000]">{account.id}</h2>
+                        {account.id != "Income" && (
+                          <h2 className="pl-[20px] text-[#00000070]">
+                            $ {account.amount}
+                          </h2>
+                        )}
                       </button>
                     );
                   })}
@@ -381,41 +410,62 @@ const Month = () => {
                 setNewBudgetTransaction(null);
               }}
               onComplete={async (value: number) => {
-                console.log();
-                await updateMonth({
-                  ...month,
-                  transactions: [
-                    ...month.transactions,
-                    {
-                      amount: Number(value),
-                      to: newBudgetTransaction.item.title,
-                      from: "Income",
-                      date: format(new Date(), "MM/dd/yyyy"),
-                    },
-                  ],
-                  budget: month.budget.map((item: any) => {
-                    if (item.id === newBudgetTransaction.category.id) {
-                      return {
-                        ...item,
-                        items: item.items.map((subCategory: any) => {
-                          if (
-                            subCategory.title ===
-                            newBudgetTransaction.item.title
-                          ) {
-                            return { ...subCategory, spent: value };
-                          } else {
-                            return subCategory;
-                          }
-                        }),
-                      };
-                    } else {
-                      return item;
-                    }
-                  }),
-                }).then(() => {
-                  refetchMonth();
+                console.log(
+                  "this is from the onComplete",
+                  fromAccounts.filter(
+                    (item: any) => item.id == "Checking Account"
+                  )[0]
+                );
+                if (
+                  fromAccounts.filter(
+                    (item: any) => item.id == "Checking Account"
+                  )[0].amount > Number(value)
+                ) {
+                  Accounttransaction(
+                    "Budget",
+                    "Checking Account",
+                    Number(value),
+                    accountData.data
+                  );
+                  await updateMonth({
+                    ...month,
+                    transactions: [
+                      ...month.transactions,
+                      {
+                        amount: Number(value),
+                        to: newBudgetTransaction.item.title,
+                        from: "Checking Account",
+                        date: format(new Date(), "MM/dd/yyyy"),
+                      },
+                    ],
+                    budget: month.budget.map((item: any) => {
+                      if (item.id === newBudgetTransaction.category.id) {
+                        return {
+                          ...item,
+                          items: item.items.map((subCategory: any) => {
+                            if (
+                              subCategory.title ===
+                              newBudgetTransaction.item.title
+                            ) {
+                              return { ...subCategory, spent: value };
+                            } else {
+                              return subCategory;
+                            }
+                          }),
+                        };
+                      } else {
+                        return item;
+                      }
+                    }),
+                  }).then(() => {
+                    refetchMonth();
+                    refetchAccounts();
+                    setNewBudgetTransaction(null);
+                  });
+                } else {
+                  alert("insufficient funds");
                   setNewBudgetTransaction(null);
-                });
+                }
               }}
             />
           }

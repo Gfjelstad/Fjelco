@@ -7,9 +7,10 @@ const Accounttransaction = async (
   amount: number,
   accounts: any
 ) => {
-  const toAccount = accounts.filter((item: any) => item.id === to)[0];
-  console.log(toAccount);
-  console.log(Number(toAccount.amount) + Number(amount));
+  const toAccount =
+    to == "Budget" ? null : accounts.filter((item: any) => item.id === to)[0];
+  // console.log(toAccount);
+  // console.log(Number(toAccount.amount) + Number(amount));
   if (from === "Income") {
     const data = await axios.post("/api/routes/updateDocument", {
       collection: "Accounts",
@@ -20,6 +21,20 @@ const Accounttransaction = async (
       },
     });
     return [data];
+  } else if (to == "Budget") {
+    const fromAccount = accounts.filter((item: any) => item.id === from)[0];
+    if (fromAccount.amount > amount) {
+      return await axios.post("/api/routes/updateDocument", {
+        collection: "Accounts",
+        document: from,
+        data: {
+          ...fromAccount,
+          amount: Number(fromAccount.amount) - Number(amount),
+        },
+      });
+    } else {
+      console.log("not enough funds");
+    }
   } else {
     const fromAccount = accounts.filter((item: any) => item.id === from)[0];
     if (fromAccount.amount > amount) {
