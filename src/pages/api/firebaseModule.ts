@@ -213,8 +213,7 @@ const getDocument = async (req: { collection: string; document: string }) => {
 
 const login = async (req: { pin: number }) => {
   const auth = getAuth(firebase);
-  const username: string = process.env.FIREBASE_USERNAME as string;
-  const password: string = process.env.PWD as string;
+
   console.log("real pin", process.env.PIN);
   console.log("given Pin", req.pin);
   if (String(req.pin) === process.env.PIN) {
@@ -226,11 +225,11 @@ const login = async (req: { pin: number }) => {
         // ...
         // New sign-in will be persisted with session persistence.
         console.log("usernsmae", process.env.FIREBASE_USERNAME);
-        console.log("password", process.env.PWD);
+        console.log("password", process.env.FIREBASE_PWD);
         const data = await signInWithEmailAndPassword(
           auth,
           process.env.FIREBASE_USERNAME!,
-          process.env.PWD!
+          process.env.FIREBASE_PWD!
         );
 
         // console.log("signin attempt", data);
