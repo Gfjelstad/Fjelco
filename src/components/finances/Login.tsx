@@ -1,101 +1,123 @@
 import useAuth from "@/hooks/useAuth";
 import { loginUser } from "@/methods/auth";
 import { useRouter } from "next/router";
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useRef, useEffect } from "react";
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+interface PinInputProps {
+  maxAttempts?: number;
+}
+
+const Login: React.FC<PinInputProps> = ({ maxAttempts = 10 }) => {
   const router = useRouter();
+  const [pin, setPin] = useState<string[]>(["", "", "", "", "", ""]);
+  const [attempts, setAttempts] = useState<number>(0);
+  const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
-  const { refetch } = useAuth();
-
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
-
-  const handleTogglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+  useEffect(() => {
+    // Focus the first input when the component mounts
+    if (inputRefs.current[0]) {
+      inputRefs.current[0].focus();
+    }
+  }, []);
 
   const handleLogin = async () => {
-    if (!validateEmail(email)) {
-      console.log("Invalid email");
-      return;
-    }
+    const thisPin: string = pin.join("");
+    const result = await loginUser(thisPin).then((res) => {
+      setTimeout(() => {
+        console.log(res);
 
-    const result = await loginUser(email, password).then((res) => {
-      console.log(res);
-      window.location.reload();
-      router.push("/Finance");
+        window.location.reload();
+        router.push("/Finance");
+      }, 200);
     });
     // Perform login logic here
-    console.log("result:", result);
-    console.log("Password:", password);
+    console.log("loginresult", result);
+  };
+  const handlePinChange = (index: number, value: string) => {
+    if (value.match(/^\d*$/) && value.length <= 1) {
+      const newPin = [...pin];
+      newPin[index] = value;
+      setPin(newPin);
+
+      // Move to the next input when a digit is entered
+      if (index < 5 && value !== "") {
+        inputRefs.current[index + 1]?.focus();
+      }
+    }
   };
 
-  const validateEmail = (email: string) => {
-    // Regular expression for email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+  const handleKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    if (event.key === "Backspace") {
+      const newPin = [...pin];
+      newPin[index] = "";
+      setPin(newPin);
+
+      // Move to the previous input when backspace is pressed and the current input is empty
+      if (index > 0 && newPin[index] === "") {
+        inputRefs.current[index - 1]?.focus();
+      }
+    }
+  };
+
+  const isPinComplete = () => {
+    return pin.every((digit) => digit !== "");
+  };
+
+  const handleReset = () => {
+    setPin(["", "", "", "", "", ""]);
+    setAttempts(0);
+  };
+
+  const handleAttempt = async () => {
+    if (!isPinComplete()) return;
+
+    setAttempts((prevAttempts) => prevAttempts + 1);
+
+    // Check the PIN here, and handle the correct/wrong attempts accordingly.
+    // For this example, let's just show an alert with the entered PIN.
+    await handleLogin();
+
+    // Clear the PIN after every attempt
+    setPin(["", "", "", "", "", ""]);
+    // Focus the first input after the attempt
+    if (inputRefs.current[0]) {
+      inputRefs.current[0].focus();
+    }
   };
 
   return (
-    <div className="w-screen h-screen bg-[#F6F6F6] flex items-center justify-center">
-      <div className="max-w-sm mx-auto">
-        <h2 className="text-2xl font-bold mb-4">Login</h2>
-        <div className="mb-4">
-          <label
-            htmlFor="email"
-            className="block text-gray-700 font-medium mb-2"
-          >
-            Email
-          </label>
+    <div className="w-full h-screen flex flex-col gap-[20px] items-center justify-center">
+      <h2>Enter 6-digit PIN:</h2>
+      <div>
+        {Array.from({ length: 6 }, (_, index) => (
           <input
-            type="email"
-            id="email"
-            className="border-gray-300 border rounded px-4 py-2 w-full"
-            value={email}
-            onChange={handleEmailChange}
+            className="rounded-[10px] border border-[#00000040] h-[40px] text-[20px]"
+            key={index}
+            ref={(el) => (inputRefs.current[index] = el)}
+            type="text"
+            value={pin[index]}
+            onChange={(e) => handlePinChange(index, e.target.value)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
+            style={{ marginRight: "10px", width: "30px", textAlign: "center" }}
           />
-        </div>
-        <div className="mb-4">
-          <label
-            htmlFor="password"
-            className="block text-gray-700 font-medium mb-2"
-          >
-            Password
-          </label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              id="password"
-              className="border-gray-300 border rounded px-4 py-2 w-full"
-              value={password}
-              onChange={handlePasswordChange}
-            />
-            <button
-              className="absolute top-1/2 right-3 transform -translate-y-1/2 bg-transparent text-gray-500 focus:outline-none"
-              onClick={handleTogglePasswordVisibility}
-            >
-              {showPassword ? "Hide" : "Show"}
-            </button>
-          </div>
-        </div>
-        <button
-          className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600"
-          onClick={handleLogin}
-        >
-          Login
-        </button>
+        ))}
       </div>
+      <button
+        className="rounded-[10px] bg-[#0066FF] text-[#fff] text-[16px] h-[30px] w-[60px] flex items-center justify-center"
+        onClick={handleAttempt}
+        disabled={!isPinComplete()}
+      >
+        Log In
+      </button>
+      <button onClick={handleReset}>Reset</button>
+      <p>
+        Attempts: {attempts} / {maxAttempts}
+      </p>
     </div>
   );
 };
-
+// className="w-full h-screen flex flex-col gap-[20px] items-center justify-center"
 export default Login;

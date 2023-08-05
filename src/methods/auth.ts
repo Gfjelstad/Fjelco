@@ -1,10 +1,9 @@
 import React from "react";
 import axios from "axios";
 
-const loginUser = async (email: string, password: string) => {
+const loginUser = async (pin: string) => {
   const data: any = await axios.post("/api/routes/login", {
-    email: email,
-    password: password,
+    pin: pin,
   });
   console.log("from login function", data);
   return data;

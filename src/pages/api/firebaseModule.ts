@@ -211,35 +211,43 @@ const getDocument = async (req: { collection: string; document: string }) => {
   return response;
 };
 
-const login = async (req: { email: string; password: string }) => {
+const login = async (req: { pin: number }) => {
   const auth = getAuth(firebase);
+  const username: string = process.env.FIREBASE_USERNAME as string;
+  const password: string = process.env.PWD as string;
+  console.log("real pin", process.env.PIN);
+  console.log("given Pin", req.pin);
+  if (String(req.pin) === process.env.PIN) {
+    const response = await setPersistence(auth, browserSessionPersistence)
+      .then(async () => {
+        // Existing and future Auth states are now persisted in the current
+        // session only. Closing the window would clear any existing state even
+        // if a user forgets to sign out.
+        // ...
+        // New sign-in will be persisted with session persistence.
+        console.log("usernsmae", process.env.FIREBASE_USERNAME);
+        const data = await signInWithEmailAndPassword(auth, username, password);
 
-  const response = await setPersistence(auth, browserSessionPersistence)
-    .then(async () => {
-      // Existing and future Auth states are now persisted in the current
-      // session only. Closing the window would clear any existing state even
-      // if a user forgets to sign out.
-      // ...
-      // New sign-in will be persisted with session persistence.
-      const data = await signInWithEmailAndPassword(
-        auth,
-        req.email,
-        req.password
-      );
-      // console.log("signin attempt", data);
-      return {
-        status: 200,
-        data: data,
-      };
-    })
-    .catch((error) => {
-      // Handle Errors here.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      return { status: 500, data: errorMessage };
-    });
+        // console.log("signin attempt", data);
+        return {
+          status: 200,
+          data: data,
+        };
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        console.log("WHAT THE FUCK");
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log("CODE", errorCode);
+        console.log("ERROR:", errorMessage);
+        return { status: 500, data: errorMessage };
+      });
 
-  return response;
+    return response;
+  } else {
+    return { status: 200, data: "Invalid Pin" };
+  }
 };
 
 const logout = async () => {
@@ -251,7 +259,7 @@ const logout = async () => {
       return { status: 200, data: "signed out" };
     })
     .catch((error) => {
-      return { status: 500, data: error };
+      return { status: error.code, data: error.message };
     });
 
   return response;
