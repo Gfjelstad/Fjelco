@@ -226,7 +226,12 @@ const login = async (req: { pin: number }) => {
         // ...
         // New sign-in will be persisted with session persistence.
         console.log("usernsmae", process.env.FIREBASE_USERNAME);
-        const data = await signInWithEmailAndPassword(auth, username, password);
+        console.log("password", process.env.PWD);
+        const data = await signInWithEmailAndPassword(
+          auth,
+          process.env.FIREBASE_USERNAME!,
+          process.env.PWD!
+        );
 
         // console.log("signin attempt", data);
         return {
