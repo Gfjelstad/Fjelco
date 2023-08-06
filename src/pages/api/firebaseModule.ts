@@ -247,7 +247,7 @@ const login = async (req: { pin: number }) => {
         console.log("ERROR:", errorMessage);
         return { status: 500, data: errorMessage };
       });
-
+    console.log("LOGIN RESPONSE", response);
     return response;
   } else {
     return { status: 200, data: "Invalid Pin" };
