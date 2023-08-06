@@ -10,7 +10,7 @@ const loginUser = async (pin: string) => {
 };
 
 const logoutUser = async () => {
-  const data: any = await axios.get("/api/routes/logout");
+  const data: any = await axios.post("/api/routes/logout");
   console.log("from login function", data);
   return data;
 };
