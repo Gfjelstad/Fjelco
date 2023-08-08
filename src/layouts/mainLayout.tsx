@@ -38,7 +38,7 @@ const MainLayout = ({ children }: Props) => {
   }, [isFetched]);
   return router.pathname.split("/").includes("Finance") ? (
     <>
-      {!loggedIn ? (
+      {loggedIn ? (
         <div className="max-w-screen bg-[#F6F6F6] min-h-screen pl-[250px] ">
           <NavBarFinance />
           <ToastContainer theme="dark" />

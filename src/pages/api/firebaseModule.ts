@@ -224,7 +224,7 @@ const login = async (req: { pin: number }) => {
         // if a user forgets to sign out.
         // ...
         // New sign-in will be persisted with session persistence.
-        console.log("usernsmae", process.env.FIREBASE_USERNAME);
+        console.log("username", process.env.FIREBASE_USERNAME);
         console.log("password", process.env.FIREBASE_PWD);
         const data = await signInWithEmailAndPassword(
           auth,
@@ -249,6 +249,7 @@ const login = async (req: { pin: number }) => {
       });
     console.log("LOGIN RESPONSE", response);
     return response;
+    // return { status: 200, data: "Invalid Pin" }
   } else {
     return { status: 200, data: "Invalid Pin" };
   }
