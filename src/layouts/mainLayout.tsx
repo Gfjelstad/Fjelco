@@ -13,29 +13,29 @@ interface Props {
 
 const MainLayout = ({ children }: Props) => {
   const router = useRouter();
-  const [loggedIn, setLoggedIn] = useState(false);
-  const { data: authData, isFetched, refetch } = useAuth();
+  const [loggedIn, setLoggedIn] = useState(true);
+  // const { data: authData, isFetched, refetch } = useAuth();
   // console.log(useRouter().pathname
-  useEffect(() => {
-    refetch();
-  }, [router.pathname]);
-  useEffect(() => {
-    if (isFetched) {
-      const checkAuthFunction = async () => {
-        const result = await checkAuth();
-        console.log("auth hook", authData.data);
-        if (router.pathname.split("/").includes("Finance") && !authData.data) {
-          setLoggedIn(false);
-        } else if (
-          router.pathname.split("/").includes("Finance") &&
-          authData.data
-        ) {
-          setLoggedIn(true);
-        }
-      };
-      checkAuthFunction();
-    }
-  }, [isFetched]);
+  // useEffect(() => {
+  //   refetch();
+  // }, [router.pathname]);
+  // useEffect(() => {
+  //   if (isFetched) {
+  //     const checkAuthFunction = async () => {
+  //       const result = await checkAuth();
+  //       console.log("auth hook", authData.data);
+  //       if (router.pathname.split("/").includes("Finance") && !authData.data) {
+  //         setLoggedIn(false);
+  //       } else if (
+  //         router.pathname.split("/").includes("Finance") &&
+  //         authData.data
+  //       ) {
+  //         setLoggedIn(true);
+  //       }
+  //     };
+  //     checkAuthFunction();
+  //   }
+  // }, [isFetched]);
   return router.pathname.split("/").includes("Finance") ? (
     <>
       {loggedIn ? (
